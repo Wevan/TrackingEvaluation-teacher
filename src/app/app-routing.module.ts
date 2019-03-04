@@ -1,10 +1,11 @@
 import {NgModule} from '@angular/core';
 import {Routes, RouterModule} from '@angular/router';
+import {CanLoginProvide} from './definder/CanLoginProvide';
 
 const routes: Routes = [
-  {path: 'user', loadChildren: './user/user.module#UserModule'},
-  {path: 'clazz', loadChildren: './clazz/clazz.module#ClazzModule'},
-  {path: 'resource', loadChildren: './resource/resource.module#ResourceModule'}
+
+  {path: '', loadChildren: './index/index.module#IndexModule', canActivate: [CanLoginProvide]},
+  {path: 'login', loadChildren: './login/login.module#LoginModule'}
 ];
 
 @NgModule({

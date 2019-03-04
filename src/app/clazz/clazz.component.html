@@ -1,0 +1,33 @@
+
+
+<div style="margin-bottom: 8px;">课程 : 数据结构</div>
+<nz-list [nzDataSource]="data" [nzRenderItem]="item" [nzItemLayout]="'horizontal'" [nzLoading]="loading">
+  <ng-template #item let-item>
+    <nz-list-item>
+      <nz-list-item-meta
+        [nzTitle]="nzTitle"
+        nzAvatar="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
+        nzDescription="Ant Design, a design language for background applications, is refined by Ant UED Team">
+        <ng-template #nzTitle>
+          <a routerLink="/clazz/detail">@###{{item.title}}</a>
+        </ng-template>
+      </nz-list-item-meta>
+    </nz-list-item>
+  </ng-template>
+</nz-list>
+<!--<hr>-->
+<!--<div style="margin-bottom: 8px;">课程 : 面向对象程序设计</div>-->
+<!--<nz-list [nzDataSource]="data" [nzRenderItem]="item" [nzItemLayout]="'horizontal'" [nzLoading]="loading">-->
+  <!--<ng-template #item let-item>-->
+    <!--<nz-list-item>-->
+      <!--<nz-list-item-meta-->
+        <!--[nzTitle]="nzTitle"-->
+        <!--nzAvatar="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"-->
+        <!--nzDescription="Ant Design, a design language for background applications, is refined by Ant UED Team">-->
+        <!--<ng-template #nzTitle>-->
+          <!--<a routerLink="/clazz/detail">{{item.title}}</a>-->
+        <!--</ng-template>-->
+      <!--</nz-list-item-meta>-->
+    <!--</nz-list-item>-->
+  <!--</ng-template>-->
+<!--</nz-list>-->

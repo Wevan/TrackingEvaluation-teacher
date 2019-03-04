@@ -1,0 +1,29 @@
+<div echarts [options]="chartOption" class="demo-chart"></div>
+<div echarts [options]="chartOption2" class="demo-chart"></div>
+
+<button nz-button nzType="primary">上传考勤表</button>
+<button nz-button nzType="default">下载考勤表模板</button>
+<button nz-button nzType="default">上传大作业成绩</button>
+<button nz-button nzType="default">导出成绩表</button>
+
+<nz-table #basicTable [nzData]="listOfData">
+  <thead>
+  <tr>
+    <th>姓名</th>
+    <th>达成度</th>
+    <th>测试均分</th>
+    <th>不及格数</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr *ngFor="let data of basicTable.data">
+    <td>{{data.name}}</td>
+    <td>{{data.age}}%</td>
+    <td>{{data.address}}</td>
+    <td>
+      <nz-divider nzType="vertical"></nz-divider>
+      <a>修改个人成绩</a>
+    </td>
+  </tr>
+  </tbody>
+</nz-table>

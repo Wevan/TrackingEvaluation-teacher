@@ -1,0 +1,47 @@
+<nz-steps [nzCurrent]="current">
+  <nz-step nzTitle="Finished"></nz-step>
+  <nz-step nzTitle="In Progress"></nz-step>
+  <nz-step nzTitle="Waiting"></nz-step>
+</nz-steps>
+
+<div class="steps-content">
+  <div [ngSwitch]="current">
+    <div *ngSwitchCase="0">
+      <div>
+        <nz-select style="width: 120px;" [(ngModel)]="selectedChapter" (ngModelChange)="provinceChange($event)">
+          <nz-option *ngFor="let p of chapterData" [nzValue]="p" [nzLabel]="p"></nz-option>
+        </nz-select>
+        <nz-select style="width: 120px;" [(ngModel)]="selectedTips">
+          <nz-option *ngFor="let c of tipsData[selectedChapter]" [nzValue]="c" [nzLabel]="c"></nz-option>
+        </nz-select>
+        <nz-upload
+          [(nzFileList)]="fileList"
+          [nzBeforeUpload]="beforeUpload">
+          <button nz-button>
+            <i nz-icon type="upload"></i><span>Select File</span>
+          </button>
+        </nz-upload>
+        <button nz-button [nzType]="'primary'" [nzLoading]="uploading" (click)="handleChange()" [disabled]="fileList.length == 0" style="margin-top: 16px">
+          {{ uploading ? 'Uploading' : 'Start Upload' }}
+        </button>
+      </div>
+    </div>
+    <div *ngSwitchCase="1">
+      <div>
+        章节信息:{{selectedChapter}}<br>
+        知识点信息：{{selectedTips}}
+      </div>
+    </div>
+    <div *ngSwitchCase="2">
+      345
+    </div>
+  </div>
+</div>
+<div class="steps-action">
+  <button nz-button nzType="default" (click)="next()" *ngIf="current < 2">
+    <span>Next</span>
+  </button>
+  <button nz-button nzType="primary" (click)="done()" *ngIf="current === 2">
+    <span>Done</span>
+  </button>
+</div>
