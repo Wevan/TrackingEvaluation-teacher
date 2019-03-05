@@ -1,3 +1,15 @@
-<p>
-  user works!
-</p>
+<div style="background: #ECECEC;padding:30px;">
+  <nz-card style="width:300px;" [nzBordered]="false" nzTitle="Card title" [nzExtra]="extraTemplate">
+    <p>工号:{{userId}}</p>
+    <p>姓名:{{username}}</p>
+    <p>院系:{{department}}</p>
+    <p>联系方式:{{contact}}</p>
+    <p>办公室:{{office}}</p>
+    <p>本学期教授年级:{{level}}</p>
+    <p>本学期教授课程:{{course}}</p>
+    <p>本学期教授班级:{{clazzs}}</p>
+  </nz-card>
+</div>
+<ng-template #extraTemplate>
+  <a routerLink="/user/info">修改</a>
+</ng-template>

@@ -1,9 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
-import {VideoRecord} from '../entity/VideoRecord';
 import {User} from '../entity/User';
 import {LoginService} from './login.service';
-import {observable} from 'rxjs';
 import {Router} from '@angular/router';
 
 

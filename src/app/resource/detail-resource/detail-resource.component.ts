@@ -74,8 +74,8 @@ export class DetailResourceComponent implements OnInit, AfterViewInit {
   ngOnInit() {
     console.log('Get the id param is ', this.routerInfo.snapshot.params['id']);
     // this.safeUrl = this.sanitizer
+    this.urlParam = 'http://localhost:8085/resource/getVideo?id=' + this.routerInfo.snapshot.params['id'];
     //   .bypassSecurityTrustUrl('http://localhost:8085/resource/getVideo?id=' + this.routerInfo.snapshot.params['id']);
-    // this.urlParam = 'http://localhost:8085/resource/getVideo?id=' + this.routerInfo.snapshot.params['id'];
     // this.videoObject.url = this.safeUrl;
     // this.videoObject.httpHeaders = {Authorization: localStorage.getItem('token')};
     // this.videoObject.withCredentials = true;

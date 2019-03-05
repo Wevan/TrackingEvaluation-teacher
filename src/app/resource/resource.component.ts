@@ -98,7 +98,7 @@ export class ResourceComponent implements OnInit {
     this.fileList.push(file);
     console.log('add file ', file);
     return false;
-  };
+  }
 
 
   /**
