@@ -1,11 +1,10 @@
 import {Injectable} from '@angular/core';
-import {HttpClient, HttpHeaders, HttpRequest, HttpResponse} from '@angular/common/http';
+import {HttpClient, HttpHeaders} from '@angular/common/http';
 
 import {Observable} from 'rxjs';
 import {Result} from '../entity/Result';
 import {VideoRecord} from '../entity/VideoRecord';
 import {Resource} from '../entity/Resource';
-import {tap} from 'rxjs/operators';
 
 @Injectable()
 export class ResourceService {
