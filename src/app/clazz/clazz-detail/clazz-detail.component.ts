@@ -1,5 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {EChartOption} from 'echarts';
+import {UploadFile} from 'ng-zorro-antd';
+import {ActivatedRoute} from '@angular/router';
 
 @Component({
   selector: 'app-clazz-detail',
@@ -104,29 +106,44 @@ export class ClazzDetailComponent implements OnInit {
    */
   listOfData = [
     {
-      key    : '1',
-      name   : '张晋霞',
-      age    : 32,
+      key: '1',
+      name: '张晋霞',
+      age: 32,
       address: '85'
     },
     {
-      key    : '2',
-      name   : 'Jim Green',
-      age    : 42,
+      key: '2',
+      name: 'Jim Green',
+      age: 42,
       address: '87'
     },
     {
-      key    : '3',
-      name   : 'Joe Black',
-      age    : 32,
+      key: '3',
+      name: 'Joe Black',
+      age: 32,
       address: '78'
     }
   ];
 
-  constructor() {
+  // 考勤表Url
+  attendenceUrl = '';
+  finalWorkUrl = '';
+  courseId = '';
+
+  constructor(private routerInfo: ActivatedRoute) {
   }
 
   ngOnInit() {
+    this.courseId = this.routerInfo.snapshot.params['id'];
+    this.attendenceUrl = '/studentGlobalWay/insert/?courseId=' + this.courseId +
+      '&typeTest=1';
+    this.finalWorkUrl = '/studentGlobalWay/insert/?courseId=' + this.courseId +
+      '&typeTest=2';
   }
+
+  beforeUpload = (file: UploadFile): boolean => {
+    console.log('File msg in Clazzdetail', file);
+    return true;
+  };
 
 }
