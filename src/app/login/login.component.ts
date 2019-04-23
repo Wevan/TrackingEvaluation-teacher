@@ -34,6 +34,7 @@ export class LoginComponent implements OnInit {
         console.log(next);
         console.log('exe');
         localStorage.setItem('token', `Bearer ${next.data}`);
+        localStorage.setItem('userName', user.username);
         this.router.navigateByUrl('/');
       },
       err => {
