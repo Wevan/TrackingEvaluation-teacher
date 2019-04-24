@@ -35,7 +35,6 @@ export class HttpInter implements HttpInterceptor {
           localStorage.getItem('token'),
         ),
       });
-      console.log('Token ', localStorage.getItem('token'));
     }
     return next.handle(request).pipe(
       tap(

@@ -8,14 +8,26 @@
 
   <nz-form-label [nzSpan]="7" nzRequired>章节</nz-form-label>
   <nz-form-control [nzSpan]="12" nzHasFeedback>
+    <!--知识点选择-->
     <div>
-      <nz-select style="width: 120px;" [(ngModel)]="selectedChapter" (ngModelChange)="provinceChange($event)"
-                 [ngModelOptions]="{standalone: true}">
-        <nz-option *ngFor="let p of chapterData" [nzValue]="p" [nzLabel]="p"></nz-option>
+      <nz-select
+        style="width: 200px;"
+        nzShowSearch
+        nzAllowClear
+        nzPlaceHolder="Select a knowledge"
+        [(ngModel)]="selectedKnowledge"
+        (ngModelChange)="log($event)"
+      >
+        <nz-option *ngFor="let p of knowledgeData;" [nzLabel]="p.label" [nzValue]="p.value"></nz-option>
       </nz-select>
-      <nz-select style="width: 120px;" [(ngModel)]="selectedTips" [ngModelOptions]="{standalone: true}">
-        <nz-option *ngFor="let c of tipsData[selectedChapter]" [nzValue]="c" [nzLabel]="c"></nz-option>
-      </nz-select>
+    </div>
+    <!--类型选择-->
+    <div>
+      <nz-radio-group [(ngModel)]="radioValue" [nzButtonStyle]="'solid'">
+        <label nz-radio-button nzValue="0">视频</label>
+        <label nz-radio-button nzValue="1">PDF</label>
+        <label nz-radio-button nzValue="2">其他文件</label>
+      </nz-radio-group>
     </div>
   </nz-form-control>
 
@@ -24,14 +36,13 @@
     <nz-upload
       [(nzFileList)]="fileList"
       [nzBeforeUpload]="beforeUpload"
-      [nzLimit]="1">
+      [nzLimit]="0"
+      (nzChange)="logFile($event)">
       <button nz-button>
         <i nz-icon type="upload"></i><span>上传文件</span>
       </button>
     </nz-upload>
   </div>
-
-
 </nz-modal>
 <!--test-->
 <nz-tabset>
@@ -53,7 +64,8 @@
           <nz-list-item-meta
             [nzTitle]="nzTitle"
             [nzDescription]="item.description">
-            <ng-template #nzTitle><a href="" (click)="download(item.id,item.title);false">{{item.title}}</a></ng-template>
+            <ng-template #nzTitle><a href="" (click)="download(item.id,item.title);false">{{item.title}}</a>
+            </ng-template>
           </nz-list-item-meta>
           <ng-template #extra>
             <img width="272" alt="logo" src="https://gw.alipayobjects.com/zos/rmsportal/mqaQswcyDLcXyDKnZfES.png">
@@ -89,7 +101,8 @@
           <nz-list-item-meta
             [nzTitle]="nzTitle"
             [nzDescription]="item.description">
-            <ng-template #nzTitle><a href="" (click)="download(item.id,item.title);false">{{item.title}}</a></ng-template>
+            <ng-template #nzTitle><a href="" (click)="download(item.id,item.title);false">{{item.title}}</a>
+            </ng-template>
           </nz-list-item-meta>
           <ng-template #extra>
             <img width="272" alt="logo" src="https://gw.alipayobjects.com/zos/rmsportal/mqaQswcyDLcXyDKnZfES.png">
@@ -125,7 +138,8 @@
           <nz-list-item-meta
             [nzTitle]="nzTitle"
             [nzDescription]="item.description">
-            <ng-template #nzTitle><a href="" (click)="download(item.id,item.title);false">{{item.title}}</a></ng-template>
+            <ng-template #nzTitle><a href="" (click)="download(item.id,item.title);false">{{item.title}}</a>
+            </ng-template>
           </nz-list-item-meta>
           <ng-template #extra>
             <img width="272" alt="logo" src="https://gw.alipayobjects.com/zos/rmsportal/mqaQswcyDLcXyDKnZfES.png">

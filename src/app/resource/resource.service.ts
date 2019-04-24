@@ -30,19 +30,23 @@ export class ResourceService {
     return this.http.post<Result>(heroesUrl, videoRecord, httpOptions);
   }
 
+  /**
+   * 上传资源文件
+   * @param resource 资源类
+   */
+
   resource(resource: Resource): Observable<Result> {
     const heroesUrl = '/resource/file?chapterId=' + resource.resourceDirctoryFile.chapterId + '&courseId='
       + resource.resourceDirctoryFile.courseId;
-    const file = new FormData();
-    file.append('file', resource.file);
-    console.log('service file is ', resource.file);
-    // const httpOptions = {
-    //   headers: new HttpHeaders({
-    //     'Content-Type': 'multipart/form-data'
-    //   })
-    // };
+    // const formData = new FormData();
+    // tslint:disable-next-line:no-any
+    // resource.file.forEach((item: any) => {
+    //   formData.append('files[]', item);
+    // });
+    // console.log('File list', formData.getAll('files[]'));
+    const fileList = resource.file;
 
-    return this.http.post<Result>(heroesUrl, file);
+    return this.http.post<Result>(heroesUrl, fileList);
   }
 
   getList(courseId: number): Observable<Result> {
@@ -67,6 +71,14 @@ export class ResourceService {
     //   )
     // );
     // return this.http.post<Result>(url, id);
+  }
+
+  /**
+   * 获取本课程知识点列表
+   */
+  getKnowledgeByCourse(courseId: number): Observable<Result> {
+    const url = '/knowledge/findByCourse/?courseId=' + courseId;
+    return this.http.get<Result>(url);
   }
 
 }
