@@ -53,6 +53,8 @@ export class ResourceComponent implements OnInit {
   knowledgeData: Array<{ label: any; value: any }> = [];
   knowledgeList = [];
 
+  knowledgeId = 0;
+
   /**
    * 资源类型
    */
@@ -92,7 +94,8 @@ export class ResourceComponent implements OnInit {
   }
 
   log(event): void {
-    console.log(event);
+    this.knowledgeId = event;
+    console.log('knowledgeId', this.knowledgeId);
   }
 
   handleCancel(): void {
@@ -155,8 +158,8 @@ export class ResourceComponent implements OnInit {
     resource.file.forEach((item: any) => {
       formData.append('fileList', item);
     });
-    const req = new HttpRequest('POST', '/resource/file?chapterId=' + resource.resourceDirctoryFile.chapterId + '&courseId='
-      + resource.resourceDirctoryFile.courseId, formData, {
+    const req = new HttpRequest('POST', '/resource/file?knowledgeId=' + this.knowledgeId + '&courseId='
+      + resource.resourceDirctoryFile.courseId + '&type=' + this.radioValue, formData, {
       // reportProgress: true
     });
     this.http

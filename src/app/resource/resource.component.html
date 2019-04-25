@@ -72,9 +72,6 @@
           </ng-template>
         </nz-list-item>
       </ng-template>
-      <!--  <ng-template #footer>-->
-      <!--    <div><b>ant design</b> footer part</div>-->
-      <!--  </ng-template>-->
 
       <!--分页-->
       <ng-template #pagination>
@@ -88,7 +85,7 @@
       [nzDataSource]="data1"
       [nzItemLayout]="'vertical'"
       [nzRenderItem]="item"
-      [nzPagination]="pagination"
+      [nzPagination]="pagination1"
     >
       <ng-template #item let-item>
         <nz-list-item [nzContent]="item.content" [nzActions]="[starAction,likeAction,msgAction]" [nzExtra]="extra">
@@ -114,7 +111,7 @@
       <!--  </ng-template>-->
 
       <!--分页-->
-      <ng-template #pagination>
+      <ng-template #pagination1>
         <nz-pagination [nzPageIndex]="1" [nzTotal]="pdfLength"
                        (nzPageIndexChange)="loadData2($event)"></nz-pagination>
       </ng-template>
@@ -125,7 +122,7 @@
       [nzDataSource]="data2"
       [nzItemLayout]="'vertical'"
       [nzRenderItem]="item"
-      [nzPagination]="pagination"
+      [nzPagination]="pagination2"
     >
       <ng-template #item let-item>
         <nz-list-item [nzContent]="item.content" [nzActions]="[starAction,likeAction,msgAction]" [nzExtra]="extra">
@@ -151,7 +148,7 @@
       <!--  </ng-template>-->
 
       <!--分页-->
-      <ng-template #pagination>
+      <ng-template #pagination2>
         <nz-pagination [nzPageIndex]="1" [nzTotal]="otherLength"
                        (nzPageIndexChange)="loadData3($event)"></nz-pagination>
       </ng-template>
