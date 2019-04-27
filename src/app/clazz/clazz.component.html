@@ -1,3 +1,9 @@
+<button nz-button nzType="primary" [nzSize]="size" nzShape="round" (click)="initReport()">
+  <i nz-icon type="edit"></i>生成报告
+</button>
+<button nz-button nzType="primary" [nzSize]="size" nzShape="round" (click)="getReport()">
+  <i nz-icon type="download"></i>下载报告
+</button>
 <div style="margin-bottom: 8px;">课程 : 数据结构</div>
 <nz-list [nzDataSource]="data" [nzRenderItem]="item" [nzItemLayout]="'horizontal'" [nzLoading]="loading">
   <ng-template #item let-item>
