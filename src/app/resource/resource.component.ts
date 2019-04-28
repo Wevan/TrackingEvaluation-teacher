@@ -185,23 +185,6 @@ export class ResourceComponent implements OnInit {
         }
       );
 
-    // this.resourceService.resource(resource).subscribe(
-    //   next => {
-    //     console.log('文件next', next);
-    //     this.uploading = false;
-    //     this.fileList = [];
-    //     this.msg.success('upload successfully.');
-    //     this.isVisible = false;
-    //     this.isOkLoading = false;
-    //   },
-    //   err => {
-    //     console.log('文件err', err);
-    //     this.uploading = false;
-    //     this.isVisible = false;
-    //     this.isOkLoading = false;
-    //     this.msg.error('upload failed.');
-    //   }
-    // );
   }
 
   /**

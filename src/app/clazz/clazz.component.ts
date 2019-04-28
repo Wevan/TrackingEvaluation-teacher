@@ -1,6 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {Result} from '../entity/Result';
+import {CookieService} from 'ngx-cookie-service';
 
 @Component({
   selector: 'app-clazz',
@@ -8,7 +9,7 @@ import {Result} from '../entity/Result';
   styleUrls: ['./clazz.component.scss']
 })
 export class ClazzComponent implements OnInit {
-  size = 'large';
+  size = 'default';
   loading = false;
   // 班级详情数据
   data = [
@@ -26,11 +27,12 @@ export class ClazzComponent implements OnInit {
     }
   ];
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private cookieService: CookieService) {
   }
 
   ngOnInit() {
   }
+
   initReport() {
     const url = '/report/file?id=31&type=1&courseId=9';
     // const url = '/report/file?id=' + localStorage.getItem('userName') + '&type=1&courseId=9';
@@ -49,7 +51,11 @@ export class ClazzComponent implements OnInit {
     this.http.get<any>(url, {responseType: 'blob'}).subscribe(
       next => {
         console.log(next);
-        this.downFile(next, localStorage.getItem('userName'), 'application/pdf');
+        let userName = localStorage.getItem('userName');
+        if (userName == null || userName === '') {
+          userName = sessionStorage.getItem('userName');
+        }
+        this.downFile(next, userName, 'application/pdf');
       },
       err => {
         console.log(err);

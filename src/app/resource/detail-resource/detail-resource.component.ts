@@ -11,7 +11,7 @@ import {distanceInWords} from 'date-fns';
   templateUrl: './detail-resource.component.html',
   styleUrls: ['./detail-resource.component.scss']
 })
-export class DetailResourceComponent implements OnInit, AfterViewInit {
+export class DetailResourceComponent implements OnInit {
 
   api: VgAPI;
   videoObject = {
@@ -67,44 +67,14 @@ export class DetailResourceComponent implements OnInit, AfterViewInit {
   inputValue = '';
 
 
-  constructor(private resourceService: ResourceService, private routerInfo: ActivatedRoute,
-              private sanitizer: DomSanitizer, private elementRef: ElementRef) {
+  constructor(private resourceService: ResourceService, private routerInfo: ActivatedRoute) {
   }
 
   ngOnInit() {
     console.log('Get the id param is ', this.routerInfo.snapshot.params['id']);
-    // this.safeUrl = this.sanitizer
     this.urlParam = 'http://localhost:8085/resource/getVideo?id=' + this.routerInfo.snapshot.params['id'];
-    //   .bypassSecurityTrustUrl('http://localhost:8085/resource/getVideo?id=' + this.routerInfo.snapshot.params['id']);
-    // this.videoObject.url = this.safeUrl;
-    // this.videoObject.httpHeaders = {Authorization: localStorage.getItem('token')};
-    // this.videoObject.withCredentials = true;
   }
 
-  ngAfterViewInit(): void {
-//     const xhr = new XMLHttpRequest();
-//     const that = this;
-//     xhr.onreadystatechange = function () {
-//       if (this.readyState === 4) {
-//         if (this.status === 200) {
-//           const res = this.response || this.responseText;
-//           // type 里的类型瞎猜的。。
-//           const blob = new Blob([res], {type: 'video/mpeg4'});
-//           const blobUrl = URL.createObjectURL(blob);
-//           that.safeUrl = that.sanitizer.bypassSecurityTrustUrl(blobUrl);
-//           // document.querySelector('.source').src = that.safeUrl;
-//           that.urlParam.nativeElement.src = blobUrl;
-//         }
-//       }
-//     };
-//     xhr.open('get', 'http://localhost:8085/resource/getVideo?id=' + this.routerInfo.snapshot.params['id'], true);
-// // 可以设置多个，例如
-//     xhr.setRequestHeader('Authorization', localStorage.getItem('token'));
-// // 发射
-//     xhr.send();
-//     console.log('src ', this.urlParam.nativeElement.src);
-//     console.log('url ', this.safeUrl);
-  }
 
   /**
    * 评论展示
@@ -155,22 +125,6 @@ export class DetailResourceComponent implements OnInit, AfterViewInit {
         this.api.getDefaultMedia().currentTime = 20;
       }
     );
-    const that = this;
-    document.getElementById('singleVideo').addEventListener('onbeforeunload', function () {
-      const videoRecord = new VideoRecord();
-
-      videoRecord.overtime = that.api.currentTime;
-      console.log('time is ', that.api.currentTime);
-      videoRecord.knowledgeId = '1';
-      videoRecord.userId = 2;
-      that.resourceService.record(videoRecord).subscribe(
-        (event: {}) => {
-        },
-        err => {
-
-        }
-      );
-    });
   }
 
   /**
@@ -198,7 +152,7 @@ export class DetailResourceComponent implements OnInit, AfterViewInit {
   pauseSend() {
     const that = this;
     if (that.api.state === 'playing') {
-      this.timeRecord();
+      // this.timeRecord();
     }
   }
 

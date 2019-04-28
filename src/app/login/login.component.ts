@@ -3,6 +3,7 @@ import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {User} from '../entity/User';
 import {LoginService} from './login.service';
 import {Router} from '@angular/router';
+import {CookieService} from 'ngx-cookie-service';
 
 
 @Component({
@@ -14,6 +15,7 @@ export class LoginComponent implements OnInit {
 
 
   validateForm: FormGroup;
+  time: number = 7 * 24 * 60 * 60 * 1000; // cookie过期时间7*24个小时
 
   submitForm(): void {
     for (const i of Object.keys(this.validateForm.controls)) {
@@ -30,11 +32,16 @@ export class LoginComponent implements OnInit {
 
     this.loginService.onLogin(user).subscribe(
       next => {
-        console.log('what');
         console.log(next);
-        console.log('exe');
-        localStorage.setItem('token', `Bearer ${next.data}`);
-        localStorage.setItem('userName', user.username);
+        console.log('login');
+        if (this.validateForm.get('remember').value) {
+          console.log('true');
+          this.cookieService.set('token', `Bearer ${next.data}`, new Date(new Date().getTime() + this.time));
+          localStorage.setItem('userName', user.username);
+        } else {
+          sessionStorage.setItem('token', `Bearer ${next.data}`);
+          sessionStorage.setItem('userName', user.username);
+        }
         this.router.navigateByUrl('/');
       },
       err => {
@@ -43,11 +50,13 @@ export class LoginComponent implements OnInit {
     );
   }
 
-  constructor(private fb: FormBuilder, private loginService: LoginService, private router: Router) {
+  constructor(private fb: FormBuilder, private loginService: LoginService, private router: Router,
+              private cookieService: CookieService) {
   }
 
   ngOnInit(): void {
-    if (localStorage.getItem('token') !== null) {
+    if (this.cookieService.get('token') !== null && this.cookieService.get('token') !== '') {
+      console.log('Login get cookie');
       this.router.navigateByUrl('/');
     }
     this.validateForm = this.fb.group({
