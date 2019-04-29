@@ -4,6 +4,7 @@ import {User} from '../entity/User';
 import {LoginService} from './login.service';
 import {Router} from '@angular/router';
 import {CookieService} from 'ngx-cookie-service';
+import {NzNotificationService} from 'ng-zorro-antd';
 
 
 @Component({
@@ -29,20 +30,28 @@ export class LoginComponent implements OnInit {
     const user = new User();
     user.username = obj.userName;
     user.password = obj.password;
-
+    // 教师的role type 是2
+    user.type = 2;
     this.loginService.onLogin(user).subscribe(
       next => {
         console.log(next);
-        console.log('login');
-        if (this.validateForm.get('remember').value) {
-          console.log('true');
-          this.cookieService.set('token', `Bearer ${next.data}`, new Date(new Date().getTime() + this.time));
-          localStorage.setItem('userName', user.username);
+        if (next.code !== 200) {
+          this.notification.blank(
+            '登陆错误',
+            '请检查您的账号和密码'
+          );
+          this.router.navigateByUrl('/login');
         } else {
-          sessionStorage.setItem('token', `Bearer ${next.data}`);
-          sessionStorage.setItem('userName', user.username);
+          if (this.validateForm.get('remember').value) {
+            console.log('true');
+            this.cookieService.set('token', `Bearer ${next.data}`, new Date(new Date().getTime() + this.time));
+            localStorage.setItem('userName', user.username);
+          } else {
+            sessionStorage.setItem('token', `Bearer ${next.data}`);
+            sessionStorage.setItem('userName', user.username);
+          }
+          this.router.navigateByUrl('/');
         }
-        this.router.navigateByUrl('/');
       },
       err => {
         console.log(err);
@@ -51,7 +60,7 @@ export class LoginComponent implements OnInit {
   }
 
   constructor(private fb: FormBuilder, private loginService: LoginService, private router: Router,
-              private cookieService: CookieService) {
+              private cookieService: CookieService, private notification: NzNotificationService) {
   }
 
   ngOnInit(): void {

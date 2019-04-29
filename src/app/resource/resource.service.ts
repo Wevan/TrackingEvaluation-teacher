@@ -1,10 +1,10 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
-
 import {Observable} from 'rxjs';
 import {Result} from '../entity/Result';
 import {VideoRecord} from '../entity/VideoRecord';
 import {Resource} from '../entity/Resource';
+import {UserComment} from '../entity/UserComment';
 
 @Injectable()
 export class ResourceService {
@@ -78,6 +78,22 @@ export class ResourceService {
    */
   getKnowledgeByCourse(courseId: number): Observable<Result> {
     const url = '/knowledge/findByCourse/?courseId=' + courseId;
+    return this.http.get<Result>(url);
+  }
+
+  /**
+   * 添加评论
+   */
+  addComment(comment: UserComment) {
+    const Url = '/comment/insert';
+    return this.http.post<Result>(Url, comment);
+  }
+
+  /**
+   * 查找一个视频下的评论
+   */
+  findComment(videoId: number) {
+    const url = '/comment/findAll?videoId=' + videoId;
     return this.http.get<Result>(url);
   }
 

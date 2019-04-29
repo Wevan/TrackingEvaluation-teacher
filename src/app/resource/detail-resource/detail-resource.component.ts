@@ -5,6 +5,7 @@ import {ResourceService} from '../resource.service';
 import {ActivatedRoute} from '@angular/router';
 import {DomSanitizer} from '@angular/platform-browser';
 import {distanceInWords} from 'date-fns';
+import {UserComment} from '../../entity/UserComment';
 
 @Component({
   selector: 'app-detail-resource',
@@ -14,78 +15,79 @@ import {distanceInWords} from 'date-fns';
 export class DetailResourceComponent implements OnInit {
 
   api: VgAPI;
-  videoObject = {
-    url: '',
-    httpHeaders: {Authorization: 'Bearer XYZ'},
-    withCredentials: true,
-  };
-  safeUrl: any;
   @ViewChild('source')
   urlParam: string;
 
   /**
    * 评论数据
    */
-  data = {
-    author: '曹华珠',
-    avatar: 'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png',
-    content: '视频内容清晰，对树讲解有几个问题想和大家探讨',
-    children: [
-      {
-        author: '张慬',
-        avatar: 'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png',
-        content: '树的内容我还是不太明白',
-        children: [
-          {
-            author: '李向阳',
-            avatar: 'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png',
-            content: '一起探讨'
-          },
-          {
-            author: '求学',
-            avatar: 'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png',
-            content: '欢迎探讨.'
-          }
-        ]
-      }
-    ]
-  };
-
-  likes = 0;
-  dislikes = 0;
-  time = distanceInWords(new Date(), new Date());
+  commentdata = [];
 
   /**
    * 输入数据
    */
-  commentdata = [];
   submitting = false;
   user = {
-    author: 'Han Solo',
+    author: sessionStorage.getItem('Name'),
     avatar: 'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png'
   };
   inputValue = '';
+  resourceId = 0;
 
 
   constructor(private resourceService: ResourceService, private routerInfo: ActivatedRoute) {
   }
 
   ngOnInit() {
-    console.log('Get the id param is ', this.routerInfo.snapshot.params['id']);
+    this.resourceId = this.routerInfo.snapshot.params['id'];
     this.urlParam = 'http://localhost:8085/resource/getVideo?id=' + this.routerInfo.snapshot.params['id'];
+    this.getAllComment();
   }
 
 
   /**
-   * 评论展示
-   */
-
-  /**
    * 评论
    */
+  getAllComment(): void {
+    this.resourceService.findComment(this.resourceId).subscribe(
+      next => {
+        console.log('Comment list', next);
+        const clist = next.data;
+        clist.map(e => {
+          const comitem = {
+            author: e.userName,
+            avatar: 'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png',
+            content: e.content,
+            datetime: e.commentTime,
+            displayTime: e.commentTime
+          };
+          this.commentdata.push(comitem);
+        });
+      },
+      err => {
+        console.log(err);
+      }
+    );
+  }
+
   handleSubmit(): void {
     this.submitting = true;
     const content = this.inputValue;
+    const comment = new UserComment();
+    comment.commentTime = this.getNowDate();
+    comment.content = this.inputValue;
+    comment.userId = <number><unknown>sessionStorage.getItem('uid');
+    comment.userName = sessionStorage.getItem('Name');
+    comment.videoId = this.resourceId;
+    this.resourceService.addComment(comment).subscribe(
+      next => {
+        console.log('Comment data', next);
+      },
+      err => {
+        console.log(err);
+      }
+    );
+    // 重置评论框内容
     this.inputValue = '';
     setTimeout(() => {
       this.submitting = false;
@@ -102,15 +104,7 @@ export class DetailResourceComponent implements OnInit {
       });
     }, 800);
   }
-  like(): void {
-    this.likes = 1;
-    this.dislikes = 0;
-  }
 
-  dislike(): void {
-    this.likes = 0;
-    this.dislikes = 1;
-  }
   /**
    * 视频预览
    */
@@ -156,5 +150,38 @@ export class DetailResourceComponent implements OnInit {
     }
   }
 
+  /**
+   * 获取格式化时间
+   */
+  getNowDate(): string {
+    const date = new Date();
+    let month: string | number = date.getMonth() + 1;
+    let strDate: string | number = date.getDate();
+    let strHour: string | number = date.getHours();
+    let strMin: string | number = date.getMinutes();
+    let strSec: string | number = date.getSeconds();
+
+    if (month <= 9) {
+      month = '0' + month;
+    }
+
+    if (strDate <= 9) {
+      strDate = '0' + strDate;
+    }
+
+    if (strHour <= 9) {
+      strHour = '0' + strHour;
+    }
+
+    if (strMin <= 9) {
+      strMin = '0' + strMin;
+    }
+
+    if (strSec <= 9) {
+      strSec = '0' + strSec;
+    }
+    return date.getFullYear() + '-' + month + '-' + strDate + ' '
+      + strHour + ':' + strMin + ':' + strSec;
+  }
 
 }
