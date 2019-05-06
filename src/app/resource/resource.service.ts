@@ -5,6 +5,7 @@ import {Result} from '../entity/Result';
 import {VideoRecord} from '../entity/VideoRecord';
 import {Resource} from '../entity/Resource';
 import {UserComment} from '../entity/UserComment';
+import {ResourceClass} from '../entity/ResourceClass';
 
 @Injectable()
 export class ResourceService {
@@ -38,19 +39,23 @@ export class ResourceService {
   resource(resource: Resource): Observable<Result> {
     const heroesUrl = '/resource/file?chapterId=' + resource.resourceDirctoryFile.chapterId + '&courseId='
       + resource.resourceDirctoryFile.courseId;
-    // const formData = new FormData();
-    // tslint:disable-next-line:no-any
-    // resource.file.forEach((item: any) => {
-    //   formData.append('files[]', item);
-    // });
-    // console.log('File list', formData.getAll('files[]'));
     const fileList = resource.file;
-
     return this.http.post<Result>(heroesUrl, fileList);
   }
 
-  getList(courseId: number): Observable<Result> {
-    const url = '/resource/list?courseId=' + courseId;
+  /**
+   * 拉取列表时需要先拉取班级列表
+   * @param courseId 班级id
+   * @param teacherId 教师id
+   */
+
+  getClasses(courseId: number, teacherId: number): Observable<Result> {
+    const url = '/courseclass/list?courseId=' + courseId + '&teacherId=' + teacherId;
+    return this.http.get<Result>(url);
+  }
+
+  getList(courseId: number, classId: number): Observable<Result> {
+    const url = '/resource/list?courseId=' + courseId + '&classId=' + classId;
     return this.http.get<Result>(url);
   }
 
@@ -95,6 +100,14 @@ export class ResourceService {
   findComment(videoId: number) {
     const url = '/comment/findAll?videoId=' + videoId;
     return this.http.get<Result>(url);
+  }
+
+  /**
+   * 添加资源的时间
+   */
+  addTime(resourceClass: ResourceClass) {
+    const Url = '/resourceClass/insert';
+    return this.http.post<Result>(Url, resourceClass);
   }
 
 }

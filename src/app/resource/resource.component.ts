@@ -7,6 +7,7 @@ import {ResourceMsg} from '../entity/ResourceMsg';
 import {Router} from '@angular/router';
 import {HttpClient, HttpRequest, HttpResponse} from '@angular/common/http';
 import {filter} from 'rxjs/operators';
+import {ResourceShow} from '../entity/ResourceShow';
 
 @Component({
   selector: 'app-resource',
@@ -20,11 +21,17 @@ export class ResourceComponent implements OnInit {
               private http: HttpClient) {
   }
 
+  courseId = 9;
+
+  // 添加的模态框
   uploading = false;
   fileList: UploadFile[] = [];
-
   isVisible = false;
   isOkLoading = false;
+  // 班级列表
+  classList: any[] = [];
+  // 用于拉取列表
+  tempClass = 0;
 
   /**
    * 资源list列表数据
@@ -33,7 +40,7 @@ export class ResourceComponent implements OnInit {
   data1: any[] = [];
   data2: any[] = [];
 
-  list: ResourceMsg[] = [];
+  list: ResourceShow[] = [];
 
   listLength: number;
   videoLength: number;
@@ -52,7 +59,6 @@ export class ResourceComponent implements OnInit {
   selectedKnowledge: { label: any; value: any } = {label: '', value: ''};
   knowledgeData: Array<{ label: any; value: any }> = [];
   knowledgeList = [];
-
   knowledgeId = 0;
 
   /**
@@ -60,9 +66,15 @@ export class ResourceComponent implements OnInit {
    */
   radioValue = '0';
 
+  /**
+   * 添加资源时间的模态框
+   */
+  isVisible1 = false;
+  dateRange = [];
+
   // pop modal
   showModal(): void {
-    this.resourceService.getKnowledgeByCourse(9).subscribe(
+    this.resourceService.getKnowledgeByCourse(this.courseId).subscribe(
       next => {
         console.log('knowledge', next);
         this.knowledgeList = next.data;
@@ -104,7 +116,7 @@ export class ResourceComponent implements OnInit {
   }
 
   /**
-   * 上传
+   * 上传======废弃
    */
 
   addResource() {
@@ -131,7 +143,6 @@ export class ResourceComponent implements OnInit {
 
   /**
    * 上传文件
-   *
    */
   beforeUpload = (file: UploadFile): boolean => {
     this.fileList = this.fileList.concat(file);
@@ -146,7 +157,7 @@ export class ResourceComponent implements OnInit {
     const resource = new Resource();
     const resourceMsg = new ResourceMsg();
     resourceMsg.chapterId = 1;
-    resourceMsg.courseId = 9;
+    resourceMsg.courseId = this.courseId;
     resourceMsg.name = '';
     resourceMsg.type = this.radioValue;
     resource.resourceDirctoryFile = resourceMsg;
@@ -200,28 +211,39 @@ export class ResourceComponent implements OnInit {
       this.data = new Array(10).fill({}).map((i, index) => {
         return {
           href: '/resource',
-          title: this.videoList[index + 10 * (pi - 1)].name,
+          title: this.videoList[index + 10 * (pi - 1)].resourceDirctoryFile.name,
           description: '',
           content: ' beautifully and efficiently.',
-          type: this.videoList[index + 10 * (pi - 1)].type,
-          url: this.videoList[index + 10 * (pi - 1)].url,
-          id: this.videoList[index + 10 * (pi - 1)].id
+          type: this.videoList[index + 10 * (pi - 1)].resourceDirctoryFile.type,
+          url: this.videoList[index + 10 * (pi - 1)].resourceDirctoryFile.url,
+          id: this.videoList[index + 10 * (pi - 1)].resourceDirctoryFile.id,
+          knowledgeId: this.videoList[index + 10 * (pi - 1)].resourceDirctoryFile.knowledgeId,
+          visible: this.videoList[index + 10 * (pi - 1)].resourceClass != null,
+          startTime: this.videoList[index + 10 * (pi - 1)].resourceClass != null ?
+            this.videoList[index + 10 * (pi - 1)].resourceClass.startTime : '',
+          endTime: this.videoList[index + 10 * (pi - 1)].resourceClass != null ?
+            this.videoList[index + 10 * (pi - 1)].resourceClass.endTime : ''
         };
       });
     } else {
       this.data = new Array(this.videoLength - 10 * (pi - 1)).fill({}).map((i, index) => {
         return {
           href: '/resource',
-          title: this.videoList[index + 10 * (pi - 1)].name,
-          description: 'Ant Design, a design language for background applications.',
+          title: this.videoList[index + 10 * (pi - 1)].resourceDirctoryFile.name,
+          description: '',
           content: ' beautifully and efficiently.',
-          type: this.videoList[index + 10 * (pi - 1)].type,
-          url: this.videoList[index + 10 * (pi - 1)].url,
-          id: this.videoList[index + 10 * (pi - 1)].id
+          type: this.videoList[index + 10 * (pi - 1)].resourceDirctoryFile.type,
+          url: this.videoList[index + 10 * (pi - 1)].resourceDirctoryFile.url,
+          id: this.videoList[index + 10 * (pi - 1)].resourceDirctoryFile.id,
+          knowledgeId: this.videoList[index + 10 * (pi - 1)].resourceDirctoryFile.knowledgeId,
+          visible: this.videoList[index + 10 * (pi - 1)].resourceClass != null,
+          startTime: this.videoList[index + 10 * (pi - 1)].resourceClass != null ?
+            this.videoList[index + 10 * (pi - 1)].resourceClass.startTime : '',
+          endTime: this.videoList[index + 10 * (pi - 1)].resourceClass != null ?
+            this.videoList[index + 10 * (pi - 1)].resourceClass.endTime : ''
         };
       });
     }
-
   }
 
   loadData2(pi: number): void {
@@ -390,22 +412,36 @@ export class ResourceComponent implements OnInit {
    * 请求列表
    */
   getList() {
-    this.resourceService.getList(1).subscribe(
+    this.resourceService.getClasses(9, <number><unknown>sessionStorage.getItem('identity')).subscribe(
+      next => {
+        this.classList = next.data;
+        console.log(this.classList);
+        this.tempClass = this.classList[0].classId;
+        this.patchList();
+      },
+      err => {
+        console.log(err);
+      }
+    );
+  }
+
+  patchList() {
+    this.resourceService.getList(9, this.tempClass).subscribe(
       next => {
         this.list = next.data;
         this.listLength = this.list.length;
         const that = this;
-        this.list.map((item: ResourceMsg) => {
+        this.list.map((item: ResourceShow) => {
             // 0视频；1pdf；2其他文件
             // @ts-ignore
-            if (item.type === 0) {
+            if (item.resourceDirctoryFile.type === 0) {
               that.videoList.push(item);
             } else {
               // @ts-ignore
-              if (item.type === 1) {
-                that.pdfList.push(item);
+              if (item.resourceDirctoryFile.type === 1) {
+                that.pdfList.push(item.resourceDirctoryFile);
               } else {
-                that.otherList.push(item);
+                that.otherList.push(item.resourceDirctoryFile);
               }
             }
           }
@@ -413,7 +449,7 @@ export class ResourceComponent implements OnInit {
         this.videoLength = this.videoList.length;
         this.pdfLength = this.pdfList.length;
         this.otherLength = this.otherList.length;
-        console.log('PdfList', this.pdfList);
+        console.log(this.videoList);
         this.loadData(1);
         this.loadData2(1);
         this.loadData3(1);
@@ -423,4 +459,28 @@ export class ResourceComponent implements OnInit {
       }
     );
   }
+
+  /**
+   * 添加资源的时间
+   */
+  handleCancel1() {
+    this.isVisible1 = false;
+    this.dateRange = [];
+  }
+
+  handleOk1() {
+    this.isVisible1 = false;
+    this.dateRange = [];
+  }
+
+  showModal1(resourceId: number, knowledgeId: number) {
+    this.isVisible1 = true;
+    console.log('ResourceId', resourceId);
+    console.log('knowledgeId', knowledgeId);
+  }
+
+  onChange(result: Date): void {
+    console.log('onChange: ', result);
+  }
+
 }
