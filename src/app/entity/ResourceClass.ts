@@ -4,6 +4,6 @@ export class ResourceClass {
   resourceId: number;
   courseId: number;
   knowledgeId: number;
-  startTime: string;
-  endTime: string;
+  startTime: number;
+  endTime: number;
 }

@@ -60,6 +60,7 @@
             <i nz-icon type="star-o" style="margin-right: 8px;"></i>
           </ng-template>
           <ng-template #msgAction>
+
             <span *ngIf="item1.visible">{{item1.startTime}} -- {{item1.endTime}}</span>
             <span *ngIf="!item1.visible">
               <button nz-button nzType="default"
@@ -166,7 +167,3 @@
 <nz-modal [(nzVisible)]="isVisible1" nzTitle="添加时间" (nzOnCancel)="handleCancel1()" (nzOnOk)="handleOk1()">
   <nz-range-picker [(ngModel)]="dateRange" (ngModelChange)="onChange($event)" nzShowTime></nz-range-picker>
 </nz-modal>
-
-
-
-

@@ -105,9 +105,9 @@ export class ResourceService {
   /**
    * 添加资源的时间
    */
-  addTime(resourceClass: ResourceClass) {
-    const Url = '/resourceClass/insert';
-    return this.http.post<Result>(Url, resourceClass);
+  addTime(tempList: ResourceClass[]) {
+    const Url = '/resourceClass/insertList';
+    return this.http.post<Result>(Url, tempList);
   }
 
 }

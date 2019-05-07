@@ -8,6 +8,7 @@ import {Router} from '@angular/router';
 import {HttpClient, HttpRequest, HttpResponse} from '@angular/common/http';
 import {filter} from 'rxjs/operators';
 import {ResourceShow} from '../entity/ResourceShow';
+import {ResourceClass} from '../entity/ResourceClass';
 
 @Component({
   selector: 'app-resource',
@@ -23,15 +24,22 @@ export class ResourceComponent implements OnInit {
 
   courseId = 9;
 
-  // 添加的模态框
+  // 添加资源的模态框
   uploading = false;
   fileList: UploadFile[] = [];
   isVisible = false;
   isOkLoading = false;
+
   // 班级列表
   classList: any[] = [];
   // 用于拉取列表
   tempClass = 0;
+  // 用于提交时间的临时存放知识点id和资源id
+  tempResource = 0;
+  tempKnowledge = 0;
+  // 用于存放临时的start和end
+  startTime: number;
+  endTime: number;
 
   /**
    * 资源list列表数据
@@ -220,9 +228,9 @@ export class ResourceComponent implements OnInit {
           knowledgeId: this.videoList[index + 10 * (pi - 1)].resourceDirctoryFile.knowledgeId,
           visible: this.videoList[index + 10 * (pi - 1)].resourceClass != null,
           startTime: this.videoList[index + 10 * (pi - 1)].resourceClass != null ?
-            this.videoList[index + 10 * (pi - 1)].resourceClass.startTime : '',
+            this.reverseDate(new Date(this.videoList[index + 10 * (pi - 1)].resourceClass.startTime)) : '',
           endTime: this.videoList[index + 10 * (pi - 1)].resourceClass != null ?
-            this.videoList[index + 10 * (pi - 1)].resourceClass.endTime : ''
+            this.reverseDate(new Date(this.videoList[index + 10 * (pi - 1)].resourceClass.endTime)) : ''
         };
       });
     } else {
@@ -238,9 +246,9 @@ export class ResourceComponent implements OnInit {
           knowledgeId: this.videoList[index + 10 * (pi - 1)].resourceDirctoryFile.knowledgeId,
           visible: this.videoList[index + 10 * (pi - 1)].resourceClass != null,
           startTime: this.videoList[index + 10 * (pi - 1)].resourceClass != null ?
-            this.videoList[index + 10 * (pi - 1)].resourceClass.startTime : '',
+            this.reverseDate(new Date(this.videoList[index + 10 * (pi - 1)].resourceClass.startTime)) : '',
           endTime: this.videoList[index + 10 * (pi - 1)].resourceClass != null ?
-            this.videoList[index + 10 * (pi - 1)].resourceClass.endTime : ''
+            this.reverseDate(new Date(this.videoList[index + 10 * (pi - 1)].resourceClass.endTime)) : ''
         };
       });
     }
@@ -461,7 +469,7 @@ export class ResourceComponent implements OnInit {
   }
 
   /**
-   * 添加资源的时间
+   * 添加资源对应的播放时间
    */
   handleCancel1() {
     this.isVisible1 = false;
@@ -471,16 +479,79 @@ export class ResourceComponent implements OnInit {
   handleOk1() {
     this.isVisible1 = false;
     this.dateRange = [];
+    const tempList: ResourceClass[] = [];
+    this.classList.map(item => {
+        const resourceClass = new ResourceClass();
+        resourceClass.resourceId = this.tempResource;
+        resourceClass.knowledgeId = this.tempKnowledge;
+        resourceClass.courseId = this.courseId;
+        resourceClass.startTime = this.startTime;
+        resourceClass.endTime = this.endTime;
+        resourceClass.classId = item.classId;
+        console.log('Here resource', resourceClass.classId);
+        tempList.push(resourceClass);
+      }
+    );
+    this.resourceService.addTime(tempList).subscribe(
+      next => {
+        this.data = [];
+        this.data1 = [];
+        this.data2 = [];
+        this.classList = [];
+        this.videoList = [];
+        this.pdfList = [];
+        this.otherList = [];
+        this.getList();
+      },
+      err => {
+        console.log(err);
+      }
+    );
   }
 
   showModal1(resourceId: number, knowledgeId: number) {
     this.isVisible1 = true;
-    console.log('ResourceId', resourceId);
-    console.log('knowledgeId', knowledgeId);
+    this.tempKnowledge = knowledgeId;
+    this.tempResource = resourceId;
   }
 
-  onChange(result: Date): void {
-    console.log('onChange: ', result);
+  onChange(result: Date[]): void {
+    this.startTime = result[0].getTime();
+    this.endTime = result[1].getTime();
+  }
+
+  /**
+   * 日期展示格式转换
+   * @param date 日期
+   */
+  reverseDate(date: Date): string {
+    let month: string | number = date.getMonth() + 1;
+    let strDate: string | number = date.getDate();
+    let strHour: string | number = date.getHours();
+    let strMin: string | number = date.getMinutes();
+    let strSec: string | number = date.getSeconds();
+
+    if (month <= 9) {
+      month = '0' + month;
+    }
+
+    if (strDate <= 9) {
+      strDate = '0' + strDate;
+    }
+
+    if (strHour <= 9) {
+      strHour = '0' + strHour;
+    }
+
+    if (strMin <= 9) {
+      strMin = '0' + strMin;
+    }
+
+    if (strSec <= 9) {
+      strSec = '0' + strSec;
+    }
+    return date.getFullYear() + '-' + month + '-' + strDate + ' '
+      + strHour + ':' + strMin + ':' + strSec;
   }
 
 }
