@@ -193,6 +193,14 @@ export class ResourceComponent implements OnInit {
           this.isOkLoading = false;
           this.selectedKnowledge = {label: '', value: ''};
           this.knowledgeData = [];
+          this.data = [];
+          this.data1 = [];
+          this.data2 = [];
+          this.classList = [];
+          this.videoList = [];
+          this.pdfList = [];
+          this.otherList = [];
+          this.getList();
         },
         () => {
           this.uploading = false;
@@ -264,6 +272,7 @@ export class ResourceComponent implements OnInit {
           content: ' beautifully and efficiently.',
           type: this.pdfList[index + 10 * (pi - 1)].type,
           url: this.pdfList[index + 10 * (pi - 1)].url,
+          knowledgeId: this.pdfList[index + 10 * (pi - 1)].knowledgeId,
           id: this.pdfList[index + 10 * (pi - 1)].id
         };
       });
@@ -276,6 +285,7 @@ export class ResourceComponent implements OnInit {
           content: ' beautifully and efficiently.',
           type: this.pdfList[index + 10 * (pi - 1)].type,
           url: this.pdfList[index + 10 * (pi - 1)].url,
+          knowledgeId: this.pdfList[index + 10 * (pi - 1)].knowledgeId,
           id: this.pdfList[index + 10 * (pi - 1)].id
         };
       });
@@ -293,6 +303,7 @@ export class ResourceComponent implements OnInit {
           content: ' beautifully and efficiently.',
           type: this.otherList[index + 10 * (pi - 1)].type,
           url: this.otherList[index + 10 * (pi - 1)].url,
+          knowledgeId: this.otherList[index + 10 * (pi - 1)].knowledgeId,
           id: this.otherList[index + 10 * (pi - 1)].id
         };
       });
@@ -305,6 +316,7 @@ export class ResourceComponent implements OnInit {
           content: ' beautifully and efficiently.',
           type: this.otherList[index + 10 * (pi - 1)].type,
           url: this.otherList[index + 10 * (pi - 1)].url,
+          knowledgeId: this.otherList[index + 10 * (pi - 1)].knowledgeId,
           id: this.otherList[index + 10 * (pi - 1)].id
         };
       });
@@ -315,13 +327,19 @@ export class ResourceComponent implements OnInit {
   /**
    * 删除
    */
-  deleteOne(id: number) {
-    this.resourceService.deleteOne(id).subscribe(
+  deleteOne(id: number, type: number, knowledgeId: number) {
+    console.log('Delete id=', id, ',type=', type, 'knowledge=', knowledgeId);
+    this.resourceService.deleteOne(id, type, knowledgeId).subscribe(
       next => {
         console.log(next);
-        this.list = next.data;
-        this.listLength = this.list.length;
-        this.loadData(1);
+        this.data = [];
+        this.data1 = [];
+        this.data2 = [];
+        this.classList = [];
+        this.videoList = [];
+        this.pdfList = [];
+        this.otherList = [];
+        this.getList();
       },
       err => {
         console.log(err);

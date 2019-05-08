@@ -59,8 +59,8 @@ export class ResourceService {
     return this.http.get<Result>(url);
   }
 
-  deleteOne(id: number): Observable<Result> {
-    const url = '/resource/deleteOne?id=' + id;
+  deleteOne(id: number, type: number, knowledgeId: number): Observable<Result> {
+    const url = '/resource/deleteOne?id=' + id + '&type=' + type + '&knowledgeId=' + knowledgeId;
     return this.http.delete<Result>(url);
   }
 
