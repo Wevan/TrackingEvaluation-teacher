@@ -2,6 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {Result} from '../entity/Result';
 import {CookieService} from 'ngx-cookie-service';
+import {ClazzService} from './clazz.service';
 
 @Component({
   selector: 'app-clazz',
@@ -9,68 +10,34 @@ import {CookieService} from 'ngx-cookie-service';
   styleUrls: ['./clazz.component.scss']
 })
 export class ClazzComponent implements OnInit {
-  size = 'default';
+
   loading = false;
   // 班级详情数据
-  data = [
-    {
-      title: '18130101'
-    },
-    {
-      title: '18130102'
-    },
-    {
-      title: '18130103'
-    },
-    {
-      title: '18130104'
-    }
-  ];
+  classList: any[] = [];
 
-  constructor(private http: HttpClient, private cookieService: CookieService) {
+  teacherId = 0;
+  courseId = 9;
+
+  constructor(private http: HttpClient, private clazzService: ClazzService, private cookieService: CookieService) {
   }
 
   ngOnInit() {
+    this.teacherId = <number><unknown>sessionStorage.getItem('identity');
+    this.getClasses();
   }
 
-  initReport() {
-    const url = '/report/file?id=31&type=1&courseId=9';
-    // const url = '/report/file?id=' + localStorage.getItem('userName') + '&type=1&courseId=9';
-    this.http.get<Result>(url).subscribe(
-      next => {
-      },
-      err => {
-        console.log(err);
-      }
-    );
-  }
-
-  getReport() {
-    const url = '/report/down?id=' + localStorage.getItem('userName');
-    // @ts-ignore
-    this.http.get<any>(url, {responseType: 'blob'}).subscribe(
+  /**
+   * 获取班级列表
+   */
+  getClasses() {
+    this.clazzService.getClasses(this.courseId, this.teacherId).subscribe(
       next => {
         console.log(next);
-        let userName = localStorage.getItem('userName');
-        if (userName == null || userName === '') {
-          userName = sessionStorage.getItem('userName');
-        }
-        this.downFile(next, userName, 'application/pdf');
+        this.classList = next.data;
       },
       err => {
         console.log(err);
       }
     );
-  }
-
-  downFile(result, fileName, fileType?) {
-    const blob = new Blob([result], {type: fileType});
-    const objectUrl = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.setAttribute('style', 'display:none');
-    a.setAttribute('href', objectUrl);
-    a.setAttribute('download', fileName);
-    a.click();
-    URL.revokeObjectURL(objectUrl);
   }
 }

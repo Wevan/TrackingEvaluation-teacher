@@ -5,7 +5,7 @@ import {ClazzDetailComponent} from './clazz-detail/clazz-detail.component';
 
 const routes: Routes = [
   {path: '', component: ClazzComponent},
-  {path: 'detail/:id', component: ClazzDetailComponent}
+  {path: 'detail/:courseId/:classId', component: ClazzDetailComponent}
 ];
 
 @NgModule({

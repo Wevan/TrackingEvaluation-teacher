@@ -27,26 +27,36 @@ export class HttpInter implements HttpInterceptor {
     let ok: string;
     let request: HttpRequest<any>;
     // 登录无需要token
-    console.log('URL ', req.url);
+
     if (this.cookieService.get('token')) {
       this.token = this.cookieService.get('token');
     } else {
       this.token = sessionStorage.getItem('token');
     }
-    console.log('Token is ', this.token);
-    if (req.url === '/user/login' || req.url === '/report/down') {
+    // 是否是获取外部接口
+    if (req.url.startsWith('http://106.12.195.114:8081')) {
       request = req.clone({
-        url: `${this.baseUrl}${req.url}`,
-        headers: req.headers.set('Content-Type', 'application/json'),
-      });
-    } else {
-      request = req.clone({
-        url: `${this.baseUrl}${req.url}`,
+        url: `${req.url}`,
         headers: req.headers.set(
           'Authorization',
           this.token,
         ),
       });
+    } else {
+      if (req.url === '/user/login' || req.url === '/report/down') {
+        request = req.clone({
+          url: `${this.baseUrl}${req.url}`,
+          headers: req.headers.set('Content-Type', 'application/json'),
+        });
+      } else {
+        request = req.clone({
+          url: `${this.baseUrl}${req.url}`,
+          headers: req.headers.set(
+            'Authorization',
+            this.token,
+          ),
+        });
+      }
     }
     return next.handle(request).pipe(
       tap(

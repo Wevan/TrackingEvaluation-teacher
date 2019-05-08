@@ -1,3 +1,9 @@
+<button nz-button nzType="primary" [nzSize]="size" nzShape="round" (click)="initReport()">
+  <i nz-icon type="edit"></i>生成报告
+</button>
+<button nz-button nzType="primary" [nzSize]="size" nzShape="round" (click)="getReport()">
+  <i nz-icon type="download"></i>下载报告
+</button>
 <div echarts [options]="chartOption" class="demo-chart"></div>
 <div echarts [options]="chartOption2" class="demo-chart"></div>
 
@@ -19,20 +25,19 @@
 <nz-table #basicTable [nzData]="listOfData">
   <thead>
   <tr>
+    <th>学号</th>
     <th>姓名</th>
     <th>达成度</th>
     <th>测试均分</th>
-    <th>不及格数</th>
   </tr>
   </thead>
   <tbody>
-  <tr *ngFor="let data of basicTable.data">
-    <td>{{data.name}}</td>
-    <td>{{data.age}}%</td>
-    <td>{{data.address}}</td>
+  <tr *ngFor="let item of basicTable.data">
+    <td>{{item.student.studentNumber}}</td>
+    <td>{{item.student.name}}</td>
+    <td>{{item.selfPercent*100}}%</td>
     <td>
-      <nz-divider nzType="vertical"></nz-divider>
-      <a>修改个人成绩</a>
+      88.88
     </td>
   </tr>
   </tbody>
