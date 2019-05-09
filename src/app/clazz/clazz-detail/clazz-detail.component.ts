@@ -6,6 +6,7 @@ import {Result} from '../../entity/Result';
 import {HttpClient} from '@angular/common/http';
 import {CookieService} from 'ngx-cookie-service';
 import {ClazzService} from '../clazz.service';
+import {StudentMsgShow} from '../../entity/StudentMsgShow';
 
 @Component({
   selector: 'app-clazz-detail',
@@ -17,6 +18,12 @@ export class ClazzDetailComponent implements OnInit {
   /**
    * 分数段展示
    */
+  over90 = 0;
+  bet8090 = 0;
+  bet7080 = 0;
+  bet6070 = 0;
+  bel60 = 0;
+  scoreList: any[] = [];
   chartOption: EChartOption = {
     tooltip: {
       trigger: 'item',
@@ -52,11 +59,11 @@ export class ClazzDetailComponent implements OnInit {
           }
         },
         data: [
-          {value: 0.1, name: '>90'},
-          {value: 0.3, name: '80~90'},
-          {value: 0.4, name: '70~80'},
-          {value: 0.1, name: '60~70'},
-          {value: 0.1, name: '<60'}
+          {value: this.over90, name: '>90'},
+          {value: this.bet8090, name: '80~90'},
+          {value: this.bet7080, name: '70~80'},
+          {value: this.bet6070, name: '60~70'},
+          {value: this.bel60, name: '<60'}
         ]
       }
     ]
@@ -111,7 +118,7 @@ export class ClazzDetailComponent implements OnInit {
   /**
    * 班级成员列表
    */
-  listOfData: any[] = [];
+  listOfData: StudentMsgShow[] = [];
 
   // 考勤表Url
   attendenceUrl = '';
@@ -153,8 +160,8 @@ export class ClazzDetailComponent implements OnInit {
 
   initReport() {
     // 这里的type指的是角色，教师为1
-    const url = '/report/file?id=31&type=1&courseId=9';
-    // const url = '/report/file?id=' + localStorage.getItem('userName') + '&type=1&courseId=9';
+    // const url = '/report/file?id=31&type=1&courseId=9';
+    const url = '/report/file?id=' + sessionStorage.getItem('userName') + '&type=1&courseId=' + this.courseId;
     this.http.get<Result>(url).subscribe(
       next => {
       },
@@ -165,7 +172,7 @@ export class ClazzDetailComponent implements OnInit {
   }
 
   getReport() {
-    const url = '/report/down?id=' + localStorage.getItem('userName');
+    const url = '/report/down?id=' + sessionStorage.getItem('identity');
     // @ts-ignore
     this.http.get<any>(url, {responseType: 'blob'}).subscribe(
       next => {
@@ -201,6 +208,7 @@ export class ClazzDetailComponent implements OnInit {
       next => {
         this.listOfData = next.data;
         this.getTqPercent();
+        this.getScores();
       },
       err => {
         console.log(err);
@@ -224,6 +232,46 @@ export class ClazzDetailComponent implements OnInit {
           }
         );
         this.okPercent = okNumber / total;
+      },
+      err => {
+        console.log(err);
+      }
+    );
+  }
+
+  /**
+   * 获取学生分数列表
+   */
+  getScores() {
+    this.classService.getScores(1, this.classId).subscribe(
+      next => {
+        this.scoreList = next.data;
+        const scoreSize = this.scoreList.length;
+        this.scoreList.forEach((item, index) => {
+          this.listOfData[index].average = item.average;
+          if (item.average < 60) {
+            this.bel60++;
+          } else if (item.average >= 60 && item.average < 70) {
+            this.bet6070++;
+          } else if (item.average >= 70 && item.average < 80) {
+            this.bet7080++;
+          } else if (item.average >= 80 && item.average <= 90) {
+            this.bet8090++;
+          } else {
+            this.over90++;
+          }
+        });
+
+        this.bel60 /= scoreSize;
+        this.bet6070 /= scoreSize;
+        this.bet7080 /= scoreSize;
+        this.bet8090 /= scoreSize;
+        this.over90 /= scoreSize;
+        console.log('Value is ', this.bel60);
+        console.log('Value is ', this.bet6070);
+        console.log('Value is ', this.bet7080);
+        console.log('Value is ', this.bet8090);
+        console.log('Value is ', this.over90);
       },
       err => {
         console.log(err);

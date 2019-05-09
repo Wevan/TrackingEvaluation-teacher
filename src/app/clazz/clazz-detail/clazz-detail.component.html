@@ -13,8 +13,8 @@
     <i nz-icon type="upload"></i><span>上传考勤表</span>
   </button>
 </nz-upload>
-<nz-upload  [nzLimit]="1"
-  nzAction="{{finalWorkUrl}}">
+<nz-upload [nzLimit]="1"
+           nzAction="{{finalWorkUrl}}">
   <button nz-button nzType="default">
     <i nz-icon type="upload"></i><span>上传大作业成绩</span>
   </button>
@@ -35,9 +35,9 @@
   <tr *ngFor="let item of basicTable.data">
     <td>{{item.student.studentNumber}}</td>
     <td>{{item.student.name}}</td>
-    <td>{{item.selfPercent*100}}%</td>
+    <td>{{item.selfPercent * 100}}%</td>
     <td>
-      88.88
+      {{item.average|number:'.2'}}
     </td>
   </tr>
   </tbody>

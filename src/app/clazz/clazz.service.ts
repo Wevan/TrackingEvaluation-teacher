@@ -39,7 +39,7 @@ export class ClazzService {
    * 拉取学生列表
    */
   getScores(courseId: number, classId: number): Observable<Result> {
-    const url = 'http://106.12.195.114:8081/class/average/' + courseId + '&classId=' + classId;
+    const url = 'http://106.12.195.114:8081/class/average/' + courseId + '/' + classId;
     return this.http.get<Result>(url);
   }
 }
