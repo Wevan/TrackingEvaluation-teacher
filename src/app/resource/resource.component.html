@@ -1,48 +1,124 @@
 <!--文件上传-->
-
 <button nz-button nzType="primary" (click)="showModal()">
   <span>添加</span>
 </button>
-<nz-modal [(nzVisible)]="isVisible" nzTitle="添加资源" (nzOnCancel)="handleCancel()" (nzOnOk)="handleOk()"
+<nz-modal [(nzVisible)]="isVisible"
+          nzTitle="添加资源"
+          (nzOnCancel)="handleCancel()"
+          (nzOnOk)="handleOk()"
           [nzOkLoading]="isOkLoading">
-
-  <nz-form-label [nzSpan]="7" nzRequired>章节</nz-form-label>
-  <nz-form-control [nzSpan]="12" nzHasFeedback>
-    <!--知识点选择-->
-    <div>
-      <nz-select
-        style="width: 200px;"
-        nzShowSearch
-        nzAllowClear
-        nzPlaceHolder="Select a knowledge"
-        [(ngModel)]="selectedKnowledge"
-        (ngModelChange)="log($event)"
-      >
-        <nz-option *ngFor="let p of knowledgeData;" [nzLabel]="p.label" [nzValue]="p.value"></nz-option>
-      </nz-select>
-    </div>
-    <!--类型选择-->
-    <div>
-      <nz-radio-group [(ngModel)]="radioValue" [nzButtonStyle]="'solid'">
-        <label nz-radio-button nzValue="0">视频</label>
-        <label nz-radio-button nzValue="1">PDF</label>
-        <label nz-radio-button nzValue="2">其他文件</label>
-      </nz-radio-group>
-    </div>
-  </nz-form-control>
-
-  <nz-form-label [nzSpan]="7" nzRequired>资源</nz-form-label>
-  <div>
-    <nz-upload
-      [(nzFileList)]="fileList"
-      [nzBeforeUpload]="beforeUpload"
-      [nzLimit]="0"
-      (nzChange)="logFile($event)">
-      <button nz-button>
-        <i nz-icon type="upload"></i><span>上传文件</span>
-      </button>
-    </nz-upload>
-  </div>
+  <form nz-form [formGroup]="validateForm">
+    <nz-form-item>
+      <nz-form-label [nzSm]="6" [nzXs]="24" nzRequired nzFor="majorName">
+        专业名称
+      </nz-form-label>
+      <nz-form-control [nzSm]="14" [nzXs]="24">
+        <nz-select
+          style="width: 200px;"
+          nzShowSearch
+          nzAllowClear
+          nzPlaceHolder="选择专业"
+          [(ngModel)]="selectedCollege"
+          (nzBlur)="getCourseList()"
+          formControlName="majorName"
+          id="majorName"
+        >
+          <span *ngFor="let item of listOfCollege;let i=index">
+          <nz-option nzLabel="{{item.name}}" nzValue="{{item.id}}"></nz-option>
+          </span>
+        </nz-select>
+        <nz-form-explain
+          *ngIf="
+            validateForm.get('majorName')?.dirty &&
+            validateForm.get('majorName')?.errors
+          ">
+          专业必须填写
+        </nz-form-explain>
+      </nz-form-control>
+    </nz-form-item>
+    <nz-form-item>
+      <nz-form-label [nzSm]="6" [nzXs]="24" nzRequired nzFor="courseName">
+        课程名称
+      </nz-form-label>
+      <nz-form-control [nzSm]="14" [nzXs]="24">
+        <nz-select
+          style="width: 200px;"
+          nzShowSearch
+          nzAllowClear
+          nzPlaceHolder="选择课程"
+          [(ngModel)]="selectedCourse"
+          (nzBlur)="getKnowledgeList()"
+          formControlName="courseName"
+          id="courseName"
+        >
+          <span *ngFor="let item of listOfCourse;let i=index">
+          <nz-option nzLabel="{{item.name}}" nzValue="{{item.id}}"></nz-option>
+          </span>
+        </nz-select>
+        <nz-form-explain
+          *ngIf="
+            validateForm.get('courseName')?.dirty &&
+            validateForm.get('courseName')?.errors
+          ">
+          课程必须填写
+        </nz-form-explain>
+      </nz-form-control>
+    </nz-form-item>
+    <nz-form-item>
+      <nz-form-label [nzSm]="6" [nzXs]="24" nzRequired nzFor="knowledgeName">
+        知识点名称
+      </nz-form-label>
+      <nz-form-control [nzSm]="14" [nzXs]="24">
+        <nz-select
+          style="width: 200px;"
+          nzShowSearch
+          nzAllowClear
+          nzPlaceHolder="选择知识点"
+          [(ngModel)]="selectedKnowledge"
+          formControlName="knowledgeName"
+          id="knowledgeName"
+        >
+            <span *ngFor="let item of listOfKnowledges;let i=index">
+            <nz-option nzLabel="{{item.name}}" nzValue="{{item.id}}"></nz-option>
+            </span>
+        </nz-select>
+        <nz-form-explain
+          *ngIf="
+              validateForm.get('knowledgeName')?.dirty &&
+              validateForm.get('knowledgeName')?.errors
+            ">
+          知识点必须填写
+        </nz-form-explain>
+      </nz-form-control>
+    </nz-form-item>
+    <nz-form-item>
+      <nz-form-label [nzSpan]="7" nzRequired>类型</nz-form-label>
+      <nz-form-control [nzSpan]="12" nzHasFeedback>
+        <!--类型选择-->
+        <div>
+          <nz-radio-group [(ngModel)]="selectedType" [nzButtonStyle]="'solid'" formControlName="typeName">
+            <label nz-radio-button nzValue="0">视频</label>
+            <label nz-radio-button nzValue="1">PDF</label>
+            <label nz-radio-button nzValue="2">其他文件</label>
+          </nz-radio-group>
+        </div>
+      </nz-form-control>
+    </nz-form-item>
+    <nz-form-item>
+      <nz-form-label [nzSpan]="7" nzRequired>资源</nz-form-label>
+      <div>
+        <nz-upload
+          [(nzFileList)]="fileList"
+          [nzBeforeUpload]="beforeUpload"
+          [nzLimit]="0"
+          (nzChange)="logFile($event)">
+          <button nz-button>
+            <i nz-icon type="upload"></i><span>上传文件</span>
+          </button>
+        </nz-upload>
+      </div>
+    </nz-form-item>
+  </form>
 </nz-modal>
 <!--资源列表-->
 <nz-tabset>

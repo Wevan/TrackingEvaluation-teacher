@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {ResourceService} from './resource.service';
 import {NzMessageService, UploadFile} from 'ng-zorro-antd';
-import {FormBuilder} from '@angular/forms';
+import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {Resource} from '../entity/Resource';
 import {ResourceMsg} from '../entity/ResourceMsg';
 import {Router} from '@angular/router';
@@ -9,6 +9,8 @@ import {HttpClient, HttpRequest, HttpResponse} from '@angular/common/http';
 import {filter} from 'rxjs/operators';
 import {ResourceShow} from '../entity/ResourceShow';
 import {ResourceClass} from '../entity/ResourceClass';
+import {Course} from '../entity/Course';
+import {KnowledgeResponse} from '../entity/KnowledgeResponse';
 
 @Component({
   selector: 'app-resource',
@@ -22,7 +24,7 @@ export class ResourceComponent implements OnInit {
               private http: HttpClient) {
   }
 
-  courseId = 9;
+  courseId = 2;
 
   // 添加资源的模态框
   uploading = false;
@@ -63,16 +65,12 @@ export class ResourceComponent implements OnInit {
   /**
    * 添加资源
    */
-
-  selectedKnowledge: { label: any; value: any } = {label: '', value: ''};
-  knowledgeData: Array<{ label: any; value: any }> = [];
-  knowledgeList = [];
-  knowledgeId = 0;
+  // knowledgeId = 0;
 
   /**
    * 资源类型
    */
-  radioValue = '0';
+  selectedType = '0';
 
   /**
    * 添加资源时间的模态框
@@ -80,74 +78,106 @@ export class ResourceComponent implements OnInit {
   isVisible1 = false;
   dateRange = [];
 
+  /**
+   * 添加资源
+   */
+  selectedCollege = null;
+  selectedKnowledge = null;
+  selectedCourse = null;
+  listOfCollege = [];
+  listOfCourse: Array<Course> = [];
+  listOfKnowledges: Array<KnowledgeResponse> = [];
+  validateForm: FormGroup;
+
+  ngOnInit(): void {
+    this.getList();
+    this.validateForm = this.fb.group({
+      majorName: [null, [Validators.required]],
+      courseName: [null, [Validators.required]],
+      knowledgeName: [null, [Validators.required]],
+      typeName: [null, [Validators.required]],
+    });
+  }
+
+  /**
+   * 添加资源模态框
+   */
   // pop modal
   showModal(): void {
-    this.resourceService.getKnowledgeByCourse(this.courseId).subscribe(
+    this.getCollegeList();
+    this.isVisible = true;
+  }
+
+
+// 专业列表
+
+  getCollegeList() {
+    this.resourceService.getCollegeList().subscribe(
       next => {
-        console.log('knowledge', next);
-        this.knowledgeList = next.data;
-        this.selectedKnowledge = {
-          label: this.knowledgeList[0].name,
-          value: this.knowledgeList[0].id
-        };
-        this.knowledgeList.map((item) => {
-          this.knowledgeData.push({
-            label: item.name,
-            value: item.id
-          });
-        });
+        if (next.code === 200) {
+          this.listOfCollege = next.data;
+          console.log('getCollegeList', next.data);
+        }
       },
-      err => {
+      (err: Error) => {
         console.log(err);
       }
     );
-    this.isVisible = true;
   }
+
+// 课程列表
+  getCourseList() {
+    this.resourceService.getCourseList(this.selectedCollege, '0').subscribe(
+      next => {
+        if (next.code === 200) {
+          this.listOfCourse = next.data;
+          console.log('listOfCourse', next.data);
+        }
+      },
+      (err: Error) => {
+        console.log(err);
+      }
+    );
+  }
+
+
+// 知识点列表
+
+  getKnowledgeList() {
+    this.resourceService.getKnowledgeByCourse(this.selectedCourse).subscribe(
+      next => {
+        if (next.code === 200) {
+          this.listOfKnowledges = next.data;
+          console.log('listOfKnowledges', next.data);
+        }
+      },
+      (err: Error) => {
+        console.log(err);
+      }
+    );
+  }
+
 
   handleOk(): void {
     this.isOkLoading = true;
     this.handleUpload();
+    this.validateForm.reset();
     window.setTimeout(() => {
       this.isVisible = false;
       this.isOkLoading = false;
     }, 3000);
   }
 
-  log(event): void {
-    this.knowledgeId = event;
-    console.log('knowledgeId', this.knowledgeId);
-  }
+  // log(event): void {
+  //   this.knowledgeId = event;
+  //   console.log('knowledgeId', this.knowledgeId);
+  // }
 
   handleCancel(): void {
+    this.validateForm.reset();
     this.isVisible = false;
     console.log('Modal ', this.selectedKnowledge);
   }
-
-  /**
-   * 上传======废弃
-   */
-
-  addResource() {
-    const resource = new Resource();
-    const resourceMsg = new ResourceMsg();
-    resourceMsg.chapterId = 1;
-    resourceMsg.courseId = 9;
-    resourceMsg.name = '';
-    resourceMsg.type = this.radioValue;
-    resource.resourceDirctoryFile = resourceMsg;
-    resource.file = this.fileList;
-
-    this.uploading = true;
-    this.resourceService.resource(resource).subscribe(
-      next => {
-        console.log(next);
-      },
-      err => {
-        console.log(err);
-      }
-    );
-  }
-
 
   /**
    * 上传文件
@@ -165,9 +195,9 @@ export class ResourceComponent implements OnInit {
     const resource = new Resource();
     const resourceMsg = new ResourceMsg();
     resourceMsg.chapterId = 1;
-    resourceMsg.courseId = this.courseId;
+    resourceMsg.courseId = this.selectedCourse;
     resourceMsg.name = '';
-    resourceMsg.type = this.radioValue;
+    resourceMsg.type = this.selectedType;
     resource.resourceDirctoryFile = resourceMsg;
     resource.file = this.fileList;
     this.uploading = true;
@@ -177,8 +207,8 @@ export class ResourceComponent implements OnInit {
     resource.file.forEach((item: any) => {
       formData.append('fileList', item);
     });
-    const req = new HttpRequest('POST', '/resource/file?knowledgeId=' + this.knowledgeId + '&courseId='
-      + resource.resourceDirctoryFile.courseId + '&type=' + this.radioValue, formData, {
+    const req = new HttpRequest('POST', '/resource/file?knowledgeId=' + this.selectedKnowledge + '&courseId='
+      + resource.resourceDirctoryFile.courseId + '&type=' + this.selectedType, formData, {
       // reportProgress: true
     });
     this.http
@@ -191,8 +221,7 @@ export class ResourceComponent implements OnInit {
           this.msg.success('upload successfully.');
           this.isVisible = false;
           this.isOkLoading = false;
-          this.selectedKnowledge = {label: '', value: ''};
-          this.knowledgeData = [];
+
           this.data = [];
           this.data1 = [];
           this.data2 = [];
@@ -207,8 +236,6 @@ export class ResourceComponent implements OnInit {
           this.msg.error('upload failed.');
           this.isVisible = false;
           this.isOkLoading = false;
-          this.selectedKnowledge = {label: '', value: ''};
-          this.knowledgeData = [];
         }
       );
 
@@ -218,9 +245,6 @@ export class ResourceComponent implements OnInit {
    * 资源列表
    */
 
-  ngOnInit(): void {
-    this.getList();
-  }
 
   loadData(pi: number): void {
     if (10 * pi <= this.videoLength) {
@@ -438,7 +462,7 @@ export class ResourceComponent implements OnInit {
    * 请求列表
    */
   getList() {
-    this.resourceService.getClasses(9, <number><unknown>sessionStorage.getItem('identity')).subscribe(
+    this.resourceService.getClasses(this.courseId, <number><unknown>sessionStorage.getItem('identity')).subscribe(
       next => {
         this.classList = next.data;
         console.log(this.classList);
@@ -452,9 +476,10 @@ export class ResourceComponent implements OnInit {
   }
 
   patchList() {
-    this.resourceService.getList(9, this.tempClass).subscribe(
+    this.resourceService.getList(this.courseId, this.tempClass).subscribe(
       next => {
         this.list = next.data;
+        console.log('资源列表', next.data);
         this.listLength = this.list.length;
         const that = this;
         this.list.map((item: ResourceShow) => {

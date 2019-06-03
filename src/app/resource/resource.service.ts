@@ -110,4 +110,13 @@ export class ResourceService {
     return this.http.post<Result>(Url, tempList);
   }
 
+  getCourseList(collegeId: number, direction: string): Observable<Result> {
+    return this.http.get<Result>('/course/findAllByCollegeId?collegeId=' + collegeId + '&direction=' + direction);
+  }
+
+  getCollegeList(): Observable<Result> {
+    return this.http.get<Result>('/college/all');
+  }
+
+
 }
