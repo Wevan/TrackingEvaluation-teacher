@@ -21,8 +21,7 @@ export class ResourceComponent implements OnInit {
 
   constructor(private msg: NzMessageService, private resourceService: ResourceService,
               private fb: FormBuilder, private router: Router,
-              private http: HttpClient) {
-  }
+              private http: HttpClient) {}
 
   courseId = 2;
 

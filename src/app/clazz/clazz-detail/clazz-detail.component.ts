@@ -24,95 +24,12 @@ export class ClazzDetailComponent implements OnInit {
   bet6070 = 0;
   bel60 = 0;
   scoreList: any[] = [];
-  chartOption: EChartOption = {
-    tooltip: {
-      trigger: 'item',
-      formatter: '{a} <br/>{b}: {c} ({d}%)'
-    },
-    legend: {
-      orient: 'vertical',
-      x: 'left',
-      data: ['>90', '80~90', '70~80', '60~70', '<60']
-    },
-    series: [
-      {
-        name: '成绩分布',
-        type: 'pie',
-        radius: ['50%', '70%'],
-        avoidLabelOverlap: false,
-        label: {
-          normal: {
-            show: false,
-            position: 'center'
-          },
-          emphasis: {
-            show: true,
-            textStyle: {
-              fontSize: '30',
-              fontWeight: 'bold'
-            }
-          }
-        },
-        labelLine: {
-          normal: {
-            show: false
-          }
-        },
-        data: [
-          {value: this.over90, name: '>90'},
-          {value: this.bet8090, name: '80~90'},
-          {value: this.bet7080, name: '70~80'},
-          {value: this.bet6070, name: '60~70'},
-          {value: this.bel60, name: '<60'}
-        ]
-      }
-    ]
-  };
+  chartOption: EChartOption = {};
   /**
    * 达成度
    */
   okPercent = 0;
-  chartOption2: EChartOption = {
-    tooltip: {
-      trigger: 'item',
-      formatter: '{a} <br/>{b}: {c} ({d}%)'
-    },
-    legend: {
-      orient: 'vertical',
-      x: 'left',
-      data: ['达标', '未达标']
-    },
-    series: [
-      {
-        name: '本期达标度分布',
-        type: 'pie',
-        radius: ['50%', '70%'],
-        avoidLabelOverlap: false,
-        label: {
-          normal: {
-            show: false,
-            position: 'center'
-          },
-          emphasis: {
-            show: true,
-            textStyle: {
-              fontSize: '30',
-              fontWeight: 'bold'
-            }
-          }
-        },
-        labelLine: {
-          normal: {
-            show: false
-          }
-        },
-        data: [
-          {value: this.okPercent, name: '达标'},
-          {value: 1 - this.okPercent, name: '未达标'},
-        ]
-      }
-    ]
-  };
+  chartOption2: EChartOption = {};
 
 
   /**
@@ -142,6 +59,7 @@ export class ClazzDetailComponent implements OnInit {
     this.finalWorkUrl = '/studentGlobalWay/insert/?courseId=' + this.courseId +
       '&typeTest=2';
     this.getStudentList();
+    this.getScores();
   }
 
   /**
@@ -208,7 +126,7 @@ export class ClazzDetailComponent implements OnInit {
       next => {
         this.listOfData = next.data;
         this.getTqPercent();
-        this.getScores();
+
       },
       err => {
         console.log(err);
@@ -232,11 +150,109 @@ export class ClazzDetailComponent implements OnInit {
           }
         );
         this.okPercent = okNumber / total;
+        this.initChart2(this.okPercent);
       },
       err => {
         console.log(err);
       }
     );
+  }
+
+  /**
+   * 达标度部分的图表初始化
+   */
+  initChart2(ok) {
+    this.chartOption2 = {
+      tooltip: {
+        trigger: 'item',
+        formatter: '{a} <br/>{b}: {c} ({d}%)'
+      },
+      legend: {
+        orient: 'vertical',
+        x: 'left',
+        data: ['达标', '未达标']
+      },
+      series: [
+        {
+          name: '本期达标度分布',
+          type: 'pie',
+          radius: ['50%', '70%'],
+          avoidLabelOverlap: false,
+          label: {
+            normal: {
+              show: false,
+              position: 'center'
+            },
+            emphasis: {
+              show: true,
+              textStyle: {
+                fontSize: '30',
+                fontWeight: 'bold'
+              }
+            }
+          },
+          labelLine: {
+            normal: {
+              show: false
+            }
+          },
+          data: [
+            {value: ok, name: '达标'},
+            {value: 1 - ok, name: '未达标'},
+          ]
+        }
+      ]
+    };
+  }
+
+  /**
+   * 成绩部分的图表初始化
+   */
+  initChart1(data1, data2, data3, data4, data5) {
+    this.chartOption = {
+      tooltip: {
+        trigger: 'item',
+        formatter: '{a} <br/>{b}: {c} ({d}%)'
+      },
+      legend: {
+        orient: 'vertical',
+        x: 'left',
+        data: ['>90', '80~90', '70~80', '60~70', '<60']
+      },
+      series: [
+        {
+          name: '成绩分布',
+          type: 'pie',
+          radius: ['50%', '70%'],
+          avoidLabelOverlap: false,
+          label: {
+            normal: {
+              show: false,
+              position: 'center'
+            },
+            emphasis: {
+              show: true,
+              textStyle: {
+                fontSize: '30',
+                fontWeight: 'bold'
+              }
+            }
+          },
+          labelLine: {
+            normal: {
+              show: false
+            }
+          },
+          data: [
+            {value: data1, name: '>90'},
+            {value: data2, name: '80~90'},
+            {value: data3, name: '70~80'},
+            {value: data4, name: '60~70'},
+            {value: data5, name: '<60'}
+          ]
+        }
+      ]
+    };
   }
 
   /**
@@ -246,6 +262,7 @@ export class ClazzDetailComponent implements OnInit {
     this.classService.getScores(1, this.classId).subscribe(
       next => {
         this.scoreList = next.data;
+        console.log('score is ', next.data);
         const scoreSize = this.scoreList.length;
         this.scoreList.forEach((item, index) => {
           this.listOfData[index].average = item.average;
@@ -267,6 +284,7 @@ export class ClazzDetailComponent implements OnInit {
         this.bet7080 /= scoreSize;
         this.bet8090 /= scoreSize;
         this.over90 /= scoreSize;
+        this.initChart1(this.bel60, this.bet6070, this.bet7080, this.bet8090, this.over90);
         console.log('Value is ', this.bel60);
         console.log('Value is ', this.bet6070);
         console.log('Value is ', this.bet7080);

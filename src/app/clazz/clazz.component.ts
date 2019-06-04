@@ -16,7 +16,7 @@ export class ClazzComponent implements OnInit {
   classList: any[] = [];
 
   teacherId = 0;
-  courseId = 1;
+  courseId = 2;
 
   constructor(private http: HttpClient, private clazzService: ClazzService, private cookieService: CookieService) {
   }
